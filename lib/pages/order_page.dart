@@ -20,7 +20,7 @@ class _OrderPageState extends State<OrderPage> {
   final cOrder = Get.put(COrder());
 
   final controllerVoucher = TextEditingController();
-  final noteController = TextEditingController();
+  final Map<int, TextEditingController> controllerNote = {};
   final formKey = GlobalKey<FormState>();
 
   final FocusNode _focusNode = FocusNode();
@@ -108,11 +108,9 @@ class _OrderPageState extends State<OrderPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     if (cOrder.listItem.isNotEmpty) ...[
-                      Text(
-                          'Total pesanan (${cOrder.listItem.length} Menu) : '),
+                      Text('Total pesanan (${cOrder.listItem.length} Menu) : '),
                     ] else ...[
-                      const Text(
-                          'Total pesanan : '),
+                      const Text('Total pesanan : '),
                     ],
                     Text(
                       'Rp. $total',
@@ -190,7 +188,6 @@ class _OrderPageState extends State<OrderPage> {
                       Icon(
                         Icons.shopping_cart_outlined,
                         color: kPrimaryColor,
-                        
                       ),
                       const SizedBox(
                         width: 7,
@@ -218,16 +215,27 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      List<Item> listItems = cOrder.listItem.map((menu) {
-                        return Item(menu.id, menu.harga, 'no');
-                      }).toList();
+                      String test = cOrder.listItem
+                          .map((e) => {
+                                '"id":${e.id}',
+                                '"harga":${e.harga}',
+                                '"catatan":"${e.catatan}"'
+                              })
+                          .toList()
+                          .join(',');
+                      print(test);
 
                       if (cOrder.listItem.isNotEmpty) {
-                        checkout(listItems);
-                      }
-                      Timer(const Duration(seconds: 2), () {
+                        // checkout(cOrder.listItem);
+                        // for (var controller in controllerNote.values) {
+                        //   controller
+                        //       .clear();
+                        // }
                         Get.to(() => const EditPage());
-                      });
+                      }
+                      // Timer(const Duration(seconds: 2), () {
+                      //   Get.to(() => const EditPage());
+                      // });
                     },
                     style: TextButton.styleFrom(
                         backgroundColor: cOrder.listItem.isEmpty
@@ -252,19 +260,23 @@ class _OrderPageState extends State<OrderPage> {
 
   ListTile listMenu(Menu data) {
     String price = data.harga.toString();
+    if (!controllerNote.containsKey(data.id)) {
+      controllerNote[data.id!] =
+          TextEditingController(); // Inisialisasi controller jika belum ada
+    }
     return ListTile(
       leading: Image.network(
-        data.gambar,
+        data.gambar ?? '',
         height: 75,
         width: 75,
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(data.nama),
+          Text(data.nama ?? ''),
           Text('Rp. $price', style: TextStyle(color: kPrimaryColor)),
           TextFormField(
-            controller: noteController,
+            controller: controllerNote[data.id],
             decoration: const InputDecoration(
               prefixIcon: Icon(Icons.notes),
               fillColor: Colors.white,
@@ -279,7 +291,8 @@ class _OrderPageState extends State<OrderPage> {
           IconButton(
             onPressed: () {
               setState(() {
-                cOrder.addToCart(data);
+                cOrder.addToCart(data.id!, data.harga!.toDouble(),
+                    controllerNote[data.id]?.text ?? '');
               });
             },
             icon: const Icon(
@@ -294,7 +307,7 @@ class _OrderPageState extends State<OrderPage> {
           IconButton(
             onPressed: () {
               setState(() {
-                cOrder.removeFromCart(data);
+                cOrder.removeFromCart(data.id!);
               });
             },
             icon: const Icon(Icons.remove, size: 20),

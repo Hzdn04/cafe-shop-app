@@ -12,20 +12,16 @@ class Order {
   Map<String, dynamic> toJson() => {
         "nominal_diskon": nominalDiskon,
         "nominal_pesanan": nominalPesanan,
-        "items": List<dynamic>.from(items!.map((x) => x.toJson())),
+        "items": items?.map((item) => item.toJson()).toList(),
       };
 }
 
 class Item {
-  int? id;
-  int? harga;
-  String? catatan;
+  final int id;
+  final double harga;
+  final String catatan;
 
-  Item(
-    int id,
-    int harga,
-    String s,
-  );
+  Item({required this.id, required this.harga, required this.catatan});
 
   Map<String, dynamic> toJson() => {
         "id": id,

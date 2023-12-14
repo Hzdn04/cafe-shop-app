@@ -53,34 +53,38 @@ class _EditPageState extends State<EditPage> {
     //   Get.snackbar('Server Trouble', "pastikan jaringan anda");
     // }
     Get.dialog(
-        AlertDialog(
-            content: const Text('Apakah anda yakin ingin membatalkan pesanan ini ?'),
-            backgroundColor: Colors.white,
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
+      AlertDialog(
+          content:
+              const Text('Apakah anda yakin ingin membatalkan pesanan ini ?'),
+          backgroundColor: Colors.white,
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          actions: [
+            TextButton(
+              child: const Text(
+                'Batal',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () => Get.back(),
             ),
-            actions: [
-              TextButton(
-                child: const Text('Batal', style: TextStyle(color: Colors.black),),
-                onPressed: () => Get.back(),
+            TextButton(
+              child: const Text(
+                'Yakin',
+                style: TextStyle(color: Colors.red),
               ),
-              TextButton(
-                child: const Text(
-                  'Yakin',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onPressed: () {
-                  cOrder.clearVoucher();
-                  cOrder.clearItem();
-                  cOrder.clearSubTotal();
-                  Get.to(() => const OrderPage());
-                },
-              ),
-            ]),
-        barrierColor: Colors.black.withOpacity(0.5),
-        transitionDuration: const Duration(milliseconds: 500),
-      );
+              onPressed: () {
+                cOrder.clearVoucher();
+                cOrder.clearItem();
+                cOrder.clearSubTotal();
+                Get.to(() => const OrderPage());
+              },
+            ),
+          ]),
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: const Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -96,7 +100,10 @@ class _EditPageState extends State<EditPage> {
             )),
           );
         }
-        if (_.listData.isEmpty) {
+        List<Menu> list =
+            _.listData.where((e) => e.id == cOrder.listItem.length).toList();
+
+        if (list.isEmpty) {
           return const Text('Not Found');
         }
 
@@ -108,9 +115,9 @@ class _EditPageState extends State<EditPage> {
               },
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
-              itemCount: _.listItem.length,
+              itemCount: list.length,
               itemBuilder: (context, index) {
-                return listMenu(_.listItem[index]);
+                return listMenu(list[index]);
               }),
         );
       })),
@@ -266,22 +273,21 @@ class _EditPageState extends State<EditPage> {
     String price = data.harga.toString();
     return ListTile(
       leading: Image.network(
-        data.gambar,
+        data.gambar ?? '',
         height: 75,
         width: 75,
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(data.nama),
+          Text(data.nama ?? ''),
           Text('Rp. $price', style: TextStyle(color: kPrimaryColor)),
-          TextFormField(
-            controller: noteController,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.notes),
-              fillColor: Colors.white,
-              hintText: 'note',
-            ),
+          const Row(
+            children: [
+              Icon(Icons.notes, size: 20,),
+              SizedBox(width: 6,),
+              Text('ok'),
+            ],
           ),
         ],
       ),

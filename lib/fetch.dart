@@ -46,9 +46,9 @@ class FetchOrder {
     Map? responseBody = await AppRequest.post(url, {
       'nominal_diskon': diskon,
       'nominal_pesanan': pesanan,
-      'items': items
+      'items': items.map((e) => {'"id":${e.id}', '"harga":${e.harga}', '"catatan":"${e.catatan}"'}).toList().join(',')
     });
-
+    
     if (responseBody == null) return false;
 
     if (responseBody['status_code'] == 200) {

@@ -24,28 +24,27 @@ class COrder extends GetxController {
   final _listData = <Menu>[].obs;
   List<Menu> get listData => _listData.value;
 
-  final _listItem = <Menu>[].obs;
-  List<Menu> get listItem => _listItem.value;
+  final _listItem = <Item>[].obs;
+  List<Item> get listItem => _listItem.value;
 
   void clearItem() {
-    _listItem.value = <Menu>[];
+    _listItem.value = <Item>[];
   }
 
   var subtotal = 0.0.obs;
 
-  void addToCart(Menu menu) {
-    listItem.add(menu);
+  void addToCart(int id, double harga, String catatan) {
+    listItem.add(Item(id: id, harga: harga, catatan: catatan));
     updateSubtotal();
   }
 
-  void removeFromCart(Menu menu) {
-    listItem.remove(menu);
+  void removeFromCart(int id) {
+    listItem.removeWhere((item) => item.id == id);
     updateSubtotal();
   }
 
   void updateSubtotal() {
-    double newSubtotal = listItem.fold(0, (sum, item) => sum + item.harga);
-    subtotal.value = newSubtotal;
+    subtotal.value = listItem.fold(0, (total, item) => total + item.harga);
   }
 
   void clearSubTotal() {
